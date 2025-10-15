@@ -1,0 +1,374 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-6 mb-2">
+                        <i class="fas fa-chart-line text-primary"></i> Coupon Usage Analytics
+                    </h1>
+                    <p class="text-muted">Track and analyze coupon usage across all orders</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('admin_promotions') }}" class="btn btn-outline-success me-2">
+                        <i class="fas fa-tags"></i> Manage Promotions
+                    </a>
+                    <a href="{{ url_for('admin') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="fs-1 text-primary mb-2">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <h3 class="card-title">{{ total_usage_count }}</h3>
+                    <p class="card-text text-muted">Total Usage Count</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="fs-1 text-success mb-2">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                    <h3 class="card-title">₹{{ "%.0f"|format(total_discount_amount) }}</h3>
+                    <p class="card-text text-muted">Total Discounts Given</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="fs-1 text-info mb-2">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <h3 class="card-title">{{ today_usage }}</h3>
+                    <p class="card-text text-muted">Today's Usage</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="fs-1 text-warning mb-2">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h3 class="card-title">₹{{ "%.0f"|format(avg_discount) }}</h3>
+                    <p class="card-text text-muted">Average Discount</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Coupons Analytics -->
+    {% if top_coupons %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-trophy"></i> Top Performing Coupons
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for coupon in top_coupons %}
+                        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                            <div class="card bg-light h-100">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title text-primary">{{ coupon.coupon_code }}</h6>
+                                    <p class="card-text">
+                                        <strong>{{ coupon.usage_count }}</strong> uses<br>
+                                        <span class="text-success">₹{{ "%.0f"|format(coupon.total_discount) }}</span> saved
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-filter"></i> Search & Filter Options
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-lg-3 col-md-6">
+                            <label for="search" class="form-label">Search</label>
+                            <input type="text" name="search" id="search" class="form-control" 
+                                   value="{{ search_term }}" 
+                                   placeholder="Code, user, order #...">
+                        </div>
+                        <div class="col-lg-2 col-md-6">
+                            <label for="coupon" class="form-label">Coupon Code</label>
+                            <select name="coupon" id="coupon" class="form-select">
+                                <option value="all" {% if coupon_filter == 'all' %}selected{% endif %}>All Coupons</option>
+                                {% for coupon in unique_coupons %}
+                                <option value="{{ coupon.coupon_code }}" 
+                                        {% if coupon_filter == coupon.coupon_code %}selected{% endif %}>
+                                    {{ coupon.coupon_code }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-6">
+                            <label for="user_type" class="form-label">User Type</label>
+                            <select name="user_type" id="user_type" class="form-select">
+                                <option value="all" {% if user_type_filter == 'all' %}selected{% endif %}>All Users</option>
+                                <option value="registered" {% if user_type_filter == 'registered' %}selected{% endif %}>Registered</option>
+                                <option value="guest" {% if user_type_filter == 'guest' %}selected{% endif %}>Guests</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-6">
+                            <label for="date" class="form-label">Time Period</label>
+                            <select name="date" id="date" class="form-select">
+                                <option value="all" {% if date_filter == 'all' %}selected{% endif %}>All Time</option>
+                                <option value="today" {% if date_filter == 'today' %}selected{% endif %}>Today</option>
+                                <option value="week" {% if date_filter == 'week' %}selected{% endif %}>This Week</option>
+                                <option value="month" {% if date_filter == 'month' %}selected{% endif %}>This Month</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-6">
+                            <label for="sort" class="form-label">Sort By</label>
+                            <select name="sort" id="sort" class="form-select">
+                                <option value="recent" {% if sort_by == 'recent' %}selected{% endif %}>Most Recent</option>
+                                <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Oldest First</option>
+                                <option value="discount_high" {% if sort_by == 'discount_high' %}selected{% endif %}>Highest Discount</option>
+                                <option value="discount_low" {% if sort_by == 'discount_low' %}selected{% endif %}>Lowest Discount</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-1 col-md-6 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Usage Records Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        Coupon Usage History 
+                        {% if usage_records.items %}
+                        ({{ usage_records.total }} total, showing {{ usage_records.items|length }})
+                        {% endif %}
+                    </h5>
+                    {% if usage_records.items %}
+                    <span class="badge bg-info">
+                        Page {{ usage_records.page }} of {{ usage_records.pages }}
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="card-body p-0">
+                    {% if usage_records.items %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Customer</th>
+                                    <th>Coupon Code</th>
+                                    <th>Order #</th>
+                                    <th>Subtotal</th>
+                                    <th>Discount</th>
+                                    <th>Discount %</th>
+                                    <th>Type</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for usage in usage_records.items %}
+                                <tr>
+                                    <td>
+                                        <div class="small">
+                                            <strong>{{ usage.used_at_ist.strftime('%d %b %Y') }}</strong><br>
+                                            <span class="text-muted">{{ usage.used_at_ist.strftime('%I:%M %p') }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ usage.customer_display_name }}</strong>
+                                            {% if not usage.is_guest_usage %}
+                                                <br><small class="text-muted">{{ usage.user_email or 'No email' }}</small>
+                                            {% else %}
+                                                <br><small class="text-muted">{{ usage.guest_phone or 'No phone' }}</small>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ usage.coupon_code }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('admin_orders') }}?search={{ usage.order_number }}" 
+                                           class="text-decoration-none">
+                                            {{ usage.order_number }}
+                                        </a>
+                                    </td>
+                                    <td>₹{{ "%.0f"|format(usage.order_subtotal) }}</td>
+                                    <td>
+                                        <span class="text-success">₹{{ "%.0f"|format(usage.discount_amount) }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success">{{ "%.1f"|format(usage.discount_percentage) }}%</span>
+                                    </td>
+                                    <td>
+                                        {% if usage.discount_type == 'percentage' %}
+                                            <span class="badge bg-info">Percentage</span>
+                                        {% elif usage.discount_type == 'fixed' %}
+                                            <span class="badge bg-warning">Fixed</span>
+                                        {% elif usage.discount_type == 'free_item_category' %}
+                                            <span class="badge bg-success">Free Items</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ usage.discount_type|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-info" 
+                                                data-bs-toggle="collapse" 
+                                                data-bs-target="#details-{{ usage.id }}">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                        <div id="details-{{ usage.id }}" class="collapse mt-2">
+                                            <div class="card card-body bg-light">
+                                                <small>
+                                                    <strong>Promotion:</strong> {{ usage.promotion.description or 'N/A' }}<br>
+                                                    {% if usage.customer_ip %}
+                                                    <strong>IP:</strong> {{ usage.customer_ip }}<br>
+                                                    {% endif %}
+                                                    <strong>Order Total:</strong> ₹{{ "%.0f"|format(usage.order.total_amount) }}<br>
+                                                    <strong>Payment:</strong> {{ usage.order.payment_method|title }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if usage_records.pages > 1 %}
+                    <div class="d-flex justify-content-center p-3">
+                        <nav aria-label="Coupon usage pagination">
+                            <ul class="pagination mb-0">
+                                {% if usage_records.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin_coupon_usage', 
+                                        page=usage_records.prev_num, 
+                                        search=search_term, 
+                                        coupon=coupon_filter,
+                                        user_type=user_type_filter,
+                                        date=date_filter,
+                                        sort=sort_by) }}">Previous</a>
+                                </li>
+                                {% endif %}
+                                
+                                {% for page_num in usage_records.iter_pages() %}
+                                    {% if page_num %}
+                                        {% if page_num != usage_records.page %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url_for('admin_coupon_usage', 
+                                                page=page_num, 
+                                                search=search_term, 
+                                                coupon=coupon_filter,
+                                                user_type=user_type_filter,
+                                                date=date_filter,
+                                                sort=sort_by) }}">{{ page_num }}</a>
+                                        </li>
+                                        {% else %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ page_num }}</span>
+                                        </li>
+                                        {% endif %}
+                                    {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if usage_records.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin_coupon_usage', 
+                                        page=usage_records.next_num, 
+                                        search=search_term, 
+                                        coupon=coupon_filter,
+                                        user_type=user_type_filter,
+                                        date=date_filter,
+                                        sort=sort_by) }}">Next</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                    {% endif %}
+
+                    {% else %}
+                    <!-- No Records Found -->
+                    <div class="p-5 text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-search fs-1 text-muted"></i>
+                        </div>
+                        <h5 class="text-muted">No Coupon Usage Records Found</h5>
+                        <p class="text-muted">
+                            {% if search_term or coupon_filter != 'all' or user_type_filter != 'all' or date_filter != 'all' %}
+                                Try adjusting your search or filter criteria.
+                            {% else %}
+                                No coupons have been used yet. Coupon usage will appear here once customers start using discount codes.
+                            {% endif %}
+                        </p>
+                        {% if search_term or coupon_filter != 'all' or user_type_filter != 'all' or date_filter != 'all' %}
+                        <a href="{{ url_for('admin_coupon_usage') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-times"></i> Clear Filters
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Optional: Auto-refresh functionality -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-submit form when filters change
+    const filters = document.querySelectorAll('#coupon, #user_type, #date, #sort');
+    filters.forEach(filter => {
+        filter.addEventListener('change', function() {
+            this.form.submit();
+        });
+    });
+});
+</script>
+{% endblock %}

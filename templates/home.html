@@ -1,0 +1,553 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Enhanced Hero Section -->
+    <div class="hero-section text-center mb-4 position-relative overflow-hidden">
+        <div class="hero-content position-relative z-3">
+            <div class="floating-elements position-absolute w-100 h-100 d-none d-md-block">
+                <div class="floating-emoji" style="top: 10%; left: 10%; animation-delay: 0s;">🍛</div>
+                <div class="floating-emoji" style="top: 20%; right: 15%; animation-delay: 2s;">🔥</div>
+                <div class="floating-emoji" style="top: 70%; left: 20%; animation-delay: 4s;">⭐</div>
+                <div class="floating-emoji" style="top: 60%; right: 10%; animation-delay: 6s;">🥘</div>
+                <div class="floating-emoji" style="top: 40%; left: 5%; animation-delay: 8s;">👑</div>
+                <div class="floating-emoji" style="top: 30%; right: 25%; animation-delay: 10s;">💎</div>
+            </div>
+            
+            <div class="hero-badge mb-4">
+                <span class="badge bg-gradient-warm fs-6 px-4 py-2 rounded-pill">
+                    <i class="fas fa-crown"></i> Premium Quality Since 2020
+                </span>
+            </div>
+            
+            <h1 class="display-2 fw-bold mb-4 text-shadow hero-title">
+                <span class="text-gradient">Biryani Club</span>
+            </h1>
+            <p class="lead fs-3 mb-4 text-white-50">Royal flavors delivered to your kingdom</p>
+            <p class="fs-5 mb-5 text-white">
+                <i class="fas fa-star text-warning"></i>
+                <i class="fas fa-star text-warning"></i>
+                <i class="fas fa-star text-warning"></i>
+                <i class="fas fa-star text-warning"></i>
+                <i class="fas fa-star text-warning"></i>
+                <span class="ms-2">Loved by 10,000+ customers</span>
+            </p>
+            
+            {% if store_open %}
+                <div class="hero-actions d-flex justify-content-center gap-3 flex-wrap mb-5">
+                    <a href="{{ url_for('menu') }}" class="btn btn-success btn-lg hero-btn shadow-lg">
+                        <i class="fas fa-utensils me-2"></i> Order Now
+                    </a>
+                    <a href="{{ url_for('menu') }}" class="btn btn-outline-light btn-lg hero-btn shadow">
+                        <i class="fas fa-book-open me-2"></i> View Menu
+                    </a>
+                </div>
+                <div class="hero-quick-stats">
+                    <div class="row justify-content-center g-2">
+                        <div class="col-auto">
+                            <div class="stat-item">
+                                <i class="fas fa-clock text-warning me-2"></i>
+                                <span class="d-none d-sm-inline">30 min </span><span>delivery</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="stat-item">
+                                <i class="fas fa-shield-alt text-success me-2"></i>
+                                <span>100% Safe</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="stat-item">
+                                <i class="fas fa-fire text-danger me-2"></i>
+                                <span>Always Fresh</span>
+                            </div>
+                        </div>
+                        <div class="col-auto d-none d-md-block">
+                            <div class="stat-item">
+                                <i class="fas fa-heart text-pink me-2"></i>
+                                <span>Made with Love</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-warning d-inline-block px-4 py-3 rounded-pill shadow-lg border-0" style="background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);">
+                    <i class="fas fa-moon me-2"></i> <strong>Kitchen Closed</strong> - We're resting! Come back tomorrow for royal treats
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Install App Banner -->
+    <div class="row mb-4" id="installBanner" style="display: none;">
+        <div class="col-12">
+            <div class="alert alert-primary alert-dismissible fade show" role="alert" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white;">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h5 class="alert-heading mb-2">
+                            <i class="fas fa-mobile-alt me-2"></i>
+                            Get The Biryani Club App!
+                        </h5>
+                        <p class="mb-0">Install our app for faster ordering, offline access, and exclusive mobile-only deals!</p>
+                    </div>
+                    <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                        <button id="installAppBtn" class="btn btn-light btn-lg me-2">
+                            <i class="fas fa-download me-2"></i>Install Now
+                        </button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Store Status -->
+    <div class="row mb-4 mb-md-5">
+        <div class="col-12">
+            <div class="card glass-effect border-0 shadow-colorful">
+                <div class="card-body py-3 py-md-4">
+                    <div class="row align-items-center g-3">
+                        <div class="col-12 col-md-6">
+                            <div class="d-flex align-items-center gap-3 justify-content-center justify-content-md-start">
+                                {% if store_open %}
+                                    <div class="status-indicator">
+                                        <div class="pulse-dot bg-success"></div>
+                                        <i class="fas fa-store fs-1 fs-md-2 text-success"></i>
+                                    </div>
+                                    <div class="text-center text-md-start">
+                                        <h3 class="card-title text-success mb-1 fw-bold fs-4 fs-md-3">Kitchen Open!</h3>
+                                        <p class="card-text mb-0 small">Fresh biryani being prepared right now</p>
+                                    </div>
+                                {% else %}
+                                    <div class="status-indicator">
+                                        <div class="pulse-dot bg-warning"></div>
+                                        <i class="fas fa-bed fs-1 fs-md-2 text-warning"></i>
+                                    </div>
+                                    <div class="text-center text-md-start">
+                                        <h3 class="card-title text-warning mb-1 fw-bold fs-4 fs-md-3">Kitchen Closed</h3>
+                                        <p class="card-text mb-0 small">Chefs are taking a well-deserved rest</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 text-center text-md-end">
+                            <div class="delivery-info">
+                                <div class="d-flex align-items-center gap-2 justify-content-center justify-content-md-end mb-2 flex-wrap">
+                                    <i class="fas fa-motorcycle text-primary fs-5"></i>
+                                    <span class="fw-semibold small">Free delivery on orders above ₹299</span>
+                                </div>
+                                <div class="text-muted small">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    Serving across the city
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Popular Items -->
+    {% if menu_items %}
+    <div class="section-header text-center mb-5">
+        <div class="section-badge">
+            <span class="badge bg-gradient-tropical fs-6 px-4 py-2 rounded-pill">
+                <i class="fas fa-fire"></i> Trending Now
+            </span>
+        </div>
+        <h2 class="display-5 fw-bold mb-3 text-gradient">
+            Customer Favorites
+        </h2>
+        <p class="lead text-muted">These dishes are flying off our kitchen!</p>
+    </div>
+
+    <div class="row g-3 g-md-4 mb-5">
+        {% for item in menu_items %}
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="card h-100 menu-item-card hover-float position-relative overflow-hidden mobile-card-stack" style="--float-delay: {{ loop.index }}">
+                {% if loop.index <= 3 %}
+                    <div class="popular-badge">
+                        <span class="badge bg-gradient-rainbow position-absolute top-0 end-0 m-3 z-3 shadow">
+                            <i class="fas fa-crown me-1"></i> #{{ loop.index }}
+                        </span>
+                    </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <div class="item-header d-flex justify-content-between align-items-start mb-3">
+                        <div class="item-emoji fs-1 position-relative">
+                            {{ item.emoji or '🍽️' }}
+                            <div class="emoji-shadow"></div>
+                        </div>
+                        <div class="price-section text-end">
+                            <div class="price-tag mobile-glow mobile-text-shadow">₹{{ "%.0f"|format(item.price) }}</div>
+                            <div class="savings-badge mt-1">
+                                <small class="text-success fw-semibold">
+                                    <i class="fas fa-percentage"></i> Best Value
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title fw-bold mb-0">{{ item.name }}</h5>
+                        <div class="veg-badge-container">
+                            {% if item.is_vegetarian %}
+                            <img src="{{ url_for('static', filename='veg-icon.png') }}" alt="Veg" class="veg-badge" title="Vegetarian" style="width: 20px; height: 20px;">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='nonveg-icon.png') }}" alt="Non-Veg" class="veg-badge" title="Non-Vegetarian" style="width: 20px; height: 20px;">
+                            {% endif %}
+                        </div>
+                    </div>
+                    <p class="card-text text-muted mb-3">{{ item.description or 'Delicious ' + item.name }}</p>
+                    
+                    <div class="item-meta d-flex justify-content-between align-items-center mb-3">
+                        <span class="category-badge badge bg-gradient-warm">{{ item.category }}</span>
+                        <div class="popularity-rating">
+                            <span class="text-danger fw-semibold">
+                                <i class="fas fa-heart"></i> {{ item.popularity }}
+                            </span>
+                            <small class="text-muted ms-1">loves</small>
+                        </div>
+                    </div>
+
+
+<!-- Welcome Popup Modal -->
+{% if session.get('show_welcome_message') %}
+<div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 25px; overflow: hidden;">
+            <div class="modal-header border-0 text-white position-relative" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem;">
+                <div class="position-absolute top-0 start-0 w-100 h-100" style="background: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1440 320\"><path fill=\"%23ffffff\" fill-opacity=\"0.1\" d=\"M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,144C960,149,1056,139,1152,122.7C1248,107,1344,85,1392,74.7L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z\"></path></svg>') no-repeat bottom; background-size: cover; opacity: 0.3;"></div>
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 welcome-modal-close-btn-x" aria-label="Close" style="z-index: 10; opacity: 0.8; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));"></button>
+                <div class="position-relative w-100 text-center">
+                    <div class="mb-3" style="animation: bounce 1s ease-in-out;">
+                        <img src="{{ url_for('static', filename='logo.png') }}" alt="Biryani Club" style="width: 80px; height: 80px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));">
+                    </div>
+                    <h3 class="modal-title fw-bold mb-0" id="welcomeModalLabel" style="font-size: 2rem;">
+                        Welcome to The Biryani Club!
+                    </h3>
+                </div>
+            </div>
+            <div class="modal-body p-4 p-md-5" style="background: linear-gradient(135deg, #fff5f3 0%, #ffffff 100%);">
+                <div class="text-center mb-4">
+                    <h4 class="fw-bold text-dark mb-3" style="font-size: 1.5rem;">
+                        Hello {{ session.get('welcome_user_name', 'Dear Food Lover') }}! 👋
+                    </h4>
+                    <p class="lead text-muted mb-4" style="font-size: 1.1rem;">
+                        We're absolutely delighted to have you join our royal family of biryani lovers! 
+                        Your journey to authentic, mouth-watering flavors starts here.
+                    </p>
+                </div>
+
+                <!-- Special Welcome Offer -->
+                <div class="card border-0 mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);">
+                    <div class="card-body p-4 text-white">
+                        <div class="row align-items-center">
+                            <div class="col-md-3 text-center mb-3 mb-md-0">
+                                <div style="font-size: 4rem; animation: pulse 2s infinite;">
+                                    🎁
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <h5 class="fw-bold mb-2" style="font-size: 1.3rem;">
+                                    <i class="fas fa-gift me-2"></i>Exclusive Welcome Offer!
+                                </h5>
+                                <p class="mb-3" style="font-size: 1.1rem;">
+                                    As a token of our appreciation, here's a special gift just for you:
+                                </p>
+                                <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3 mb-3">
+                                    <div class="coupon-box p-3 bg-white text-dark rounded-3 shadow-sm" style="border: 2px dashed #667eea;">
+                                        <div class="text-muted small mb-1">YOUR COUPON CODE</div>
+                                        <div class="fw-bold" style="font-size: 1.8rem; letter-spacing: 2px; font-family: 'Courier New', monospace; color: #667eea;">
+                                            WELCOME20
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 1.5rem;">20% OFF</div>
+                                        <div class="small">on your first order!</div>
+                                    </div>
+                                </div>
+                                <p class="small mb-0 opacity-75">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Valid on orders above ₹200 | Maximum discount ₹200
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Features -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="text-center p-3 rounded-3" style="background: rgba(102, 126, 234, 0.1);">
+                            <div class="fs-2 mb-2">🍛</div>
+                            <h6 class="fw-bold mb-1">Premium Quality</h6>
+                            <p class="small text-muted mb-0">Authentic recipes & finest ingredients</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 rounded-3" style="background: rgba(118, 75, 162, 0.1);">
+                            <div class="fs-2 mb-2">⚡</div>
+                            <h6 class="fw-bold mb-1">Lightning Fast</h6>
+                            <p class="small text-muted mb-0">Delivered hot in 30 minutes</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 rounded-3" style="background: rgba(255, 107, 53, 0.1);">
+                            <div class="fs-2 mb-2">💝</div>
+                            <h6 class="fw-bold mb-1">Made with Love</h6>
+                            <p class="small text-muted mb-0">Every dish crafted with care</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="button" class="btn btn-lg px-5 py-3 text-white fw-bold welcome-modal-close-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 50px; box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);">
+                        <i class="fas fa-utensils me-2"></i>Start Ordering Now!
+                    </button>
+                    <p class="small text-muted mt-3 mb-0">
+                        Your coupon code <strong>WELCOME20</strong> has been saved for your first order
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.coupon-box {
+    animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0%, 100% { box-shadow: 0 0 5px rgba(102, 126, 234, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.6); }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const welcomeModalEl = document.getElementById('welcomeModal');
+    if (welcomeModalEl) {
+        // Show welcome modal automatically
+        const welcomeModal = new bootstrap.Modal(welcomeModalEl);
+        welcomeModal.show();
+        
+        // Handle close button clicks (both X button and "Start Ordering" button)
+        const closeBtns = welcomeModalEl.querySelectorAll('.welcome-modal-close-btn, .welcome-modal-close-btn-x');
+        closeBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                welcomeModal.hide();
+                // Clear the session flag after user closes
+                fetch('/clear_welcome_flag', { method: 'POST' });
+            });
+        });
+        
+        // Also clear flag when modal is hidden by any method
+        welcomeModalEl.addEventListener('hidden.bs.modal', function() {
+            fetch('/clear_welcome_flag', { method: 'POST' });
+        });
+    }
+});
+</script>
+{% endif %}
+
+                    
+                    <div class="item-features">
+                        <div class="row g-2 text-center">
+                            <div class="col-4">
+                                <div class="feature-item">
+                                    <i class="fas fa-leaf text-success"></i>
+                                    <small class="d-block text-muted">Fresh</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="feature-item">
+                                    <i class="fas fa-clock text-warning"></i>
+                                    <small class="d-block text-muted">Fast</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="feature-item">
+                                    <i class="fas fa-award text-primary"></i>
+                                    <small class="d-block text-muted">Premium</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if store_open and get_current_user() %}
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <form action="{{ url_for('add_to_cart') }}" method="POST" class="add-to-cart-form">
+                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                        <div class="quantity-selector mb-3">
+                            <label class="form-label small fw-semibold">Quantity:</label>
+                            <div class="input-group">
+                                <button type="button" class="btn btn-outline-secondary qty-btn" data-action="decrease">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" name="quantity" value="1" min="1" max="10" class="form-control text-center fw-bold qty-input">
+                                <button type="button" class="btn btn-outline-secondary qty-btn" data-action="increase">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 add-cart-btn mobile-pulse">
+                            <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                        </button>
+                    </form>
+                </div>
+                {% elif store_open %}
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login to Order
+                    </a>
+                </div>
+                {% else %}
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <button class="btn btn-secondary w-100" disabled>
+                        <i class="fas fa-moon me-2"></i>Kitchen Closed
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="text-center mb-5">
+        <a href="{{ url_for('menu') }}" class="btn btn-lg btn-gradient-warm">
+            <i class="fas fa-utensils me-2"></i>View Full Menu
+            <i class="fas fa-arrow-right ms-2"></i>
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Categories -->
+    {% if categories %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">
+                <i class="fas fa-th-large"></i> Browse by Category
+            </h2>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        {% for category in categories %}
+        <div class="col-md-6 col-lg-3">
+            <a href="{{ url_for('menu', category=category) }}" class="text-decoration-none">
+                <div class="card text-center h-100 category-card hover-float glow-on-hover" style="--float-delay: {{ loop.index }}">
+                    <div class="card-body">
+                        <div class="fs-1 mb-3">
+                            {% if category == 'Biryani' %}🍛
+                            {% elif category == 'Starters' %}🥘
+                            {% elif category == 'Sides' %}🥗
+                            {% elif category == 'Desserts' %}🍰
+                            {% elif category == 'Beverages' %}🥤
+                            {% else %}🍽️
+                            {% endif %}
+                        </div>
+                        <h5 class="card-title">{{ category }}</h5>
+                        <p class="card-text text-muted">Explore our {{ category.lower() }} collection</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Features -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">
+                <i class="fas fa-crown text-warning"></i> Why Choose Biryani Club?
+            </h2>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card text-center h-100 feature-card hover-float glow-on-hover">
+                <div class="card-body">
+                    <div class="text-primary fs-1 mb-3">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <h5 class="card-title">Authentic Recipes</h5>
+                    <p class="card-text">Traditional recipes passed down through generations</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card text-center h-100 feature-card hover-float glow-on-hover">
+                <div class="card-body">
+                    <div class="text-success fs-1 mb-3">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h5 class="card-title">Fast Delivery</h5>
+                    <p class="card-text">Hot and fresh biryani delivered in 30 minutes</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card text-center h-100 feature-card hover-float glow-on-hover">
+                <div class="card-body">
+                    <div class="text-warning fs-1 mb-3">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h5 class="card-title">Premium Quality</h5>
+                    <p class="card-text">Only the finest ingredients and spices used</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card text-center h-100 feature-card hover-float glow-on-hover">
+                <div class="card-body">
+                    <div class="text-info fs-1 mb-3">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h5 class="card-title">Customer Love</h5>
+                    <p class="card-text">Thousands of satisfied customers across the city</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Connect home page install button to the same functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const homeInstallBtn = document.getElementById('installAppBtn');
+        const navInstallBtn = document.getElementById('installBtn');
+        
+        if (homeInstallBtn && navInstallBtn) {
+            homeInstallBtn.addEventListener('click', function() {
+                // Trigger the navigation install button click
+                navInstallBtn.click();
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,925 @@
+{% extends "base.html" %}
+
+{% block content %}
+<script>
+document.body.classList.add('offers-page');
+</script>
+
+<!-- Gradient Background with Floating Elements -->
+<div class="offers-page-bg"></div>
+
+<div class="container offers-container">
+    <!-- Enhanced Hero Section with Animation -->
+    <div class="offers-hero text-center mb-5 animate-fade-in">
+        <div class="floating-gifts">
+            <div class="gift-float" style="--delay: 0s; --x: 10%">🎁</div>
+            <div class="gift-float" style="--delay: 1s; --x: 85%">💝</div>
+            <div class="gift-float" style="--delay: 2s; --x: 20%">🎉</div>
+            <div class="gift-float" style="--delay: 3s; --x: 75%">✨</div>
+            <div class="gift-float" style="--delay: 4s; --x: 50%">🌟</div>
+        </div>
+        
+        <div class="offers-hero-content position-relative">
+            <div class="offers-icon-wrapper mb-4">
+                <div class="rotating-gift">
+                    <i class="fas fa-gift fa-4x"></i>
+                </div>
+            </div>
+            <h1 class="display-3 fw-bold mb-3 hero-title">
+                <span class="text-gradient-rainbow">Exclusive Offers</span>
+            </h1>
+            <p class="lead mb-4 hero-subtitle">Unlock amazing deals and save big on your favorite biryani!</p>
+            {% if get_current_user() %}
+            <div class="welcome-badge-animated">
+                <span class="badge badge-glow fs-5 px-5 py-3 rounded-pill">
+                    <i class="fas fa-user-crown"></i> Hey {{ get_current_user().full_name or get_current_user().username }}!
+                </span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Special Welcome Banner (for WELCOME20) -->
+    <div class="row mb-5 animate-slide-up" style="--delay: 0.2s">
+        <div class="col-12">
+            <div class="welcome-super-card">
+                <div class="welcome-super-bg"></div>
+                <div class="welcome-super-content">
+                    <div class="row align-items-center">
+                        <div class="col-lg-2 text-center mb-3 mb-lg-0">
+                            <div class="mega-emoji">
+                                <span>🎉</span>
+                            </div>
+                        </div>
+                        <div class="col-lg-7 text-center text-lg-start mb-3 mb-lg-0">
+                            <h2 class="welcome-title mb-2">🌟 Welcome Special!</h2>
+                            <p class="welcome-desc mb-3">Get started with a bang! Here's a special gift for your first order</p>
+                            <div class="coupon-mega-display">
+                                <div class="coupon-label">YOUR EXCLUSIVE CODE</div>
+                                <div class="coupon-code-mega" id="mega-coupon">WELCOME20</div>
+                                <button class="btn-copy-mega" onclick="copyCouponCode('WELCOME20')">
+                                    <i class="fas fa-copy"></i> Copy Code
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 text-center">
+                            <div class="discount-mega-badge">
+                                <div class="discount-value">20%</div>
+                                <div class="discount-label">OFF</div>
+                                <div class="discount-terms">First Order | Max ₹200</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Offers - Beautiful Card Grid -->
+    {% if active_promotions %}
+    <div class="section-header-offers text-center mb-5 animate-slide-up" style="--delay: 0.4s">
+        <h2 class="section-title-offers mb-2">
+            <i class="fas fa-fire fire-icon"></i> Hot Deals 
+        </h2>
+        <p class="section-subtitle-offers">Grab these sizzling offers before they're gone!</p>
+    </div>
+
+    <div class="row g-4 mb-5">
+        {% for promo in active_promotions %}
+        <div class="col-sm-6 col-lg-4 col-xl-3 animate-slide-up" style="--delay: {{ 0.1 * loop.index }}s">
+            <div class="promo-card-modern">
+                <!-- Card Glow Effect -->
+                <div class="card-glow-effect"></div>
+                
+                <!-- Card Header with Icon -->
+                <div class="promo-header">
+                    <div class="promo-icon-wrapper">
+                        {% if promo.discount_type == 'percentage' %}
+                        <div class="promo-icon promo-icon-percent">
+                            <i class="fas fa-percent"></i>
+                        </div>
+                        {% elif promo.discount_type == 'fixed' %}
+                        <div class="promo-icon promo-icon-rupee">
+                            <i class="fas fa-indian-rupee-sign"></i>
+                        </div>
+                        {% else %}
+                        <div class="promo-icon promo-icon-gift">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if promo.expires_at %}
+                    <div class="promo-expiry-badge">
+                        <i class="fas fa-clock"></i> {{ promo.expires_at.strftime('%d %b') }}
+                    </div>
+                    {% else %}
+                    <div class="promo-expiry-badge promo-no-expiry">
+                        <i class="fas fa-infinity"></i> No Expiry
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Card Body -->
+                <div class="promo-body">
+                    <h5 class="promo-title">{{ promo.description or promo.code }}</h5>
+                    
+                    <!-- Discount Value Display -->
+                    <div class="promo-value-display">
+                        {% if promo.discount_type == 'percentage' %}
+                        <div class="promo-discount-value">
+                            <span class="value-number">{{ promo.discount_value|int }}%</span>
+                            <span class="value-text">OFF</span>
+                        </div>
+                        {% if promo.max_discount %}
+                        <p class="promo-limit">Max ₹{{ promo.max_discount|int }}</p>
+                        {% endif %}
+                        
+                        {% elif promo.discount_type == 'fixed' %}
+                        <div class="promo-discount-value">
+                            <span class="value-number">₹{{ promo.discount_value|int }}</span>
+                            <span class="value-text">OFF</span>
+                        </div>
+                        
+                        {% elif promo.discount_type == 'free_item_category' %}
+                        <div class="promo-discount-value">
+                            <span class="value-number">🎁</span>
+                            <span class="value-text">Free {{ promo.free_item_category }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if promo.min_order_amount > 0 %}
+                    <div class="promo-min-order">
+                        <i class="fas fa-shopping-bag"></i> Min ₹{{ promo.min_order_amount|int }}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Card Footer with Coupon Code -->
+                <div class="promo-footer">
+                    <div class="promo-code-box">
+                        <div class="promo-code-label">Coupon Code</div>
+                        <div class="promo-code-text">{{ promo.code }}</div>
+                    </div>
+                    <button class="btn-promo-copy" onclick="copyCouponCode('{{ promo.code }}', {{ promo.id }})">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+                
+                <!-- Usage Progress Bar -->
+                {% if promo.usage_limit %}
+                <div class="promo-usage">
+                    <div class="usage-bar-container">
+                        <div class="usage-bar" style="width: {{ (promo.used_count / promo.usage_limit * 100)|int }}%"></div>
+                    </div>
+                    <div class="usage-text">{{ promo.used_count }}/{{ promo.usage_limit }} claimed</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="row animate-slide-up" style="--delay: 0.4s">
+        <div class="col-12">
+            <div class="no-offers-card">
+                <div class="no-offers-icon">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <h3 class="no-offers-title">No Active Offers Right Now</h3>
+                <p class="no-offers-text">Check back soon for exciting new deals!</p>
+                <a href="{{ url_for('menu') }}" class="btn-no-offers">
+                    <i class="fas fa-utensils"></i> Browse Menu
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- How to Use - Interactive Guide -->
+    <div class="row mt-5 animate-slide-up" style="--delay: 0.6s">
+        <div class="col-12">
+            <div class="how-to-card">
+                <h3 class="how-to-title text-center mb-5">
+                    <i class="fas fa-lightbulb"></i> How to Use Coupons
+                </h3>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="how-to-step">
+                            <div class="step-number">1</div>
+                            <div class="step-icon">
+                                <i class="fas fa-hand-pointer fa-3x"></i>
+                            </div>
+                            <h5 class="step-title">Pick Your Deal</h5>
+                            <p class="step-desc">Browse and copy your favorite coupon code</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="how-to-step">
+                            <div class="step-number">2</div>
+                            <div class="step-icon">
+                                <i class="fas fa-cart-plus fa-3x"></i>
+                            </div>
+                            <h5 class="step-title">Add to Cart</h5>
+                            <p class="step-desc">Fill your cart with delicious items</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="how-to-step">
+                            <div class="step-number">3</div>
+                            <div class="step-icon">
+                                <i class="fas fa-badge-check fa-3x"></i>
+                            </div>
+                            <h5 class="step-title">Apply & Save</h5>
+                            <p class="step-desc">Paste code at checkout and enjoy savings!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Now CTA -->
+    <div class="row mt-5 mb-5 text-center animate-slide-up" style="--delay: 0.8s">
+        <div class="col-12">
+            <a href="{{ url_for('menu') }}" class="btn-order-mega">
+                <span class="btn-text">Start Ordering Now</span>
+                <span class="btn-icon"><i class="fas fa-arrow-right"></i></span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced Styles -->
+<style>
+/* Animated Background */
+.offers-page-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    opacity: 0.05;
+    z-index: -1;
+}
+
+.offers-container {
+    position: relative;
+    z-index: 1;
+    padding: 3rem 0;
+}
+
+/* Floating Gifts Animation */
+.floating-gifts {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.gift-float {
+    position: absolute;
+    font-size: 2rem;
+    animation: floatUpDown 4s ease-in-out infinite;
+    left: var(--x);
+    animation-delay: var(--delay);
+    opacity: 0.3;
+}
+
+@keyframes floatUpDown {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-30px) rotate(10deg); }
+}
+
+/* Hero Section */
+.offers-hero {
+    position: relative;
+    padding: 2rem 0;
+}
+
+.rotating-gift {
+    display: inline-block;
+    animation: rotateGift 3s ease-in-out infinite;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+@keyframes rotateGift {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(20deg) scale(1.1); }
+}
+
+.text-gradient-rainbow {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 3s ease infinite;
+    background-size: 200% 200%;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.hero-subtitle {
+    color: #64748b;
+    font-size: 1.25rem;
+}
+
+.badge-glow {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Welcome Super Card */
+.welcome-super-card {
+    position: relative;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+    min-height: 250px;
+}
+
+.welcome-super-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    opacity: 1;
+}
+
+.welcome-super-content {
+    position: relative;
+    padding: 3rem;
+    color: white;
+}
+
+.mega-emoji span {
+    font-size: 5rem;
+    display: inline-block;
+    animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+.welcome-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.welcome-desc {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.coupon-mega-display {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    justify-content: flex-start;
+}
+
+@media (max-width: 992px) {
+    .coupon-mega-display {
+        justify-content: center;
+    }
+}
+
+.coupon-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    opacity: 0.8;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.coupon-code-mega {
+    background: white;
+    color: #667eea;
+    padding: 1rem 2rem;
+    border-radius: 15px;
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    font-family: 'Courier New', monospace;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.btn-copy-mega {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid white;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-copy-mega:hover {
+    background: white;
+    color: #667eea;
+    transform: translateY(-2px);
+}
+
+.discount-mega-badge {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.discount-value {
+    font-size: 3.5rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.discount-label {
+    font-size: 1.5rem;
+    font-weight: 700;
+    opacity: 0.9;
+}
+
+.discount-terms {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-top: 0.5rem;
+}
+
+/* Section Headers */
+.section-title-offers {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.fire-icon {
+    color: #f97316;
+    animation: fire 1.5s ease-in-out infinite;
+}
+
+@keyframes fire {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+.section-subtitle-offers {
+    font-size: 1.1rem;
+    color: #64748b;
+}
+
+/* Modern Promo Cards */
+.promo-card-modern {
+    position: relative;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.promo-card-modern:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(102, 126, 234, 0.25);
+}
+
+.card-glow-effect {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+
+.promo-card-modern:hover .card-glow-effect {
+    opacity: 1;
+}
+
+.promo-header {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.promo-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.promo-icon-percent {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.promo-icon-rupee {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+}
+
+.promo-icon-gift {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+
+.promo-expiry-badge {
+    background: rgba(241, 245, 249, 1);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.promo-no-expiry {
+    background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+    color: #d63031;
+}
+
+.promo-body {
+    padding: 0 1.5rem 1.5rem;
+    flex: 1;
+}
+
+.promo-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.promo-value-display {
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.promo-discount-value {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.value-number {
+    font-size: 3rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+}
+
+.value-text {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #64748b;
+    margin-top: 0.5rem;
+}
+
+.promo-limit {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+}
+
+.promo-min-order {
+    background: #f1f5f9;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.promo-footer {
+    padding: 1.5rem;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+
+.promo-code-box {
+    background: white;
+    border: 2px dashed #cbd5e1;
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.promo-code-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #94a3b8;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.promo-code-text {
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: #1e293b;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+}
+
+.btn-promo-copy {
+    width: 100%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    color: white;
+    padding: 0.8rem;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-promo-copy:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.promo-usage {
+    padding: 0 1.5rem 1.5rem;
+}
+
+.usage-bar-container {
+    background: #e2e8f0;
+    height: 6px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.usage-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 10px;
+    transition: width 0.4s;
+}
+
+.usage-text {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-align: center;
+}
+
+/* How To Section */
+.how-to-card {
+    background: white;
+    border-radius: 25px;
+    padding: 3rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+.how-to-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.how-to-step {
+    position: relative;
+    text-align: center;
+    padding: 2rem;
+    transition: transform 0.3s;
+}
+
+.how-to-step:hover {
+    transform: translateY(-5px);
+}
+
+.step-number {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.2rem;
+}
+
+.step-icon {
+    margin: 3rem 0 1.5rem;
+    color: #667eea;
+}
+
+.step-title {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.step-desc {
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+/* Order Mega Button */
+.btn-order-mega {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 1.5rem 3rem;
+    border-radius: 50px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.4s;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.btn-order-mega:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+    color: white;
+}
+
+.btn-icon {
+    transition: transform 0.3s;
+}
+
+.btn-order-mega:hover .btn-icon {
+    transform: translateX(5px);
+}
+
+/* No Offers State */
+.no-offers-card {
+    background: white;
+    border-radius: 25px;
+    padding: 4rem 2rem;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+.no-offers-icon {
+    font-size: 4rem;
+    color: #cbd5e1;
+    margin-bottom: 2rem;
+}
+
+.no-offers-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 1rem;
+}
+
+.no-offers-text {
+    font-size: 1.1rem;
+    color: #64748b;
+    margin-bottom: 2rem;
+}
+
+.btn-no-offers {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s;
+}
+
+.btn-no-offers:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    color: white;
+}
+
+/* Animations */
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.6s ease-out;
+    animation-delay: var(--delay, 0s);
+    animation-fill-mode: both;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .offers-hero {
+        padding: 1rem 0;
+    }
+    
+    .display-3 {
+        font-size: 2rem;
+    }
+    
+    .welcome-super-content {
+        padding: 2rem 1.5rem;
+    }
+    
+    .coupon-code-mega {
+        font-size: 1.5rem;
+        padding: 0.8rem 1.5rem;
+    }
+    
+    .discount-value {
+        font-size: 2.5rem;
+    }
+    
+    .how-to-card {
+        padding: 2rem 1.5rem;
+    }
+}
+</style>
+
+<script>
+function copyCouponCode(code, promoId = null) {
+    navigator.clipboard.writeText(code).then(() => {
+        const btn = event.currentTarget;
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        btn.style.background = 'linear-gradient(135deg, #00b894, #00cec9)';
+        
+        setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.style.background = '';
+        }, 2000);
+        
+        showToast(`${code} copied! Apply it at checkout`, 'success');
+    }).catch(err => {
+        showToast('Failed to copy code', 'error');
+    });
+}
+
+function showToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = 'position-fixed top-0 start-50 translate-middle-x mt-3';
+    toast.style.zIndex = '9999';
+    toast.style.animation = 'slideDown 0.3s ease-out';
+    toast.innerHTML = `
+        <div class="alert alert-${type === 'success' ? 'success' : 'danger'} shadow-lg px-4 py-3 rounded-pill">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            <strong>${message}</strong>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideUp 0.3s ease-out';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+</script>
+{% endblock %}

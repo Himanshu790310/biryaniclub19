@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-6 mb-2">
+                        <i class="fas fa-edit text-primary"></i> Edit Menu Item
+                    </h1>
+                    <p class="text-muted">Update menu item details</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('admin_menu') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left"></i> Back to Menu
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Form -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Edit: {{ menu_item.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="name" class="form-label">Item Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       value="{{ menu_item.name }}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="emoji" class="form-label">Emoji</label>
+                                <input type="text" class="form-control text-center" id="emoji" name="emoji" 
+                                       value="{{ menu_item.emoji or '' }}" maxlength="10">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3">{{ menu_item.description or '' }}</textarea>
+                        </div>
+
+                        <!-- Image Upload Section -->
+                        <div class="mb-4">
+                            <label class="form-label">Item Image</label>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <input type="file" class="form-control" id="image" name="image" 
+                                           accept="image/jpeg,image/jpg,image/png,image/webp" onchange="previewImage(this)">
+                                    <small class="form-text text-muted">
+                                        Upload new image (JPG, PNG, WEBP). Max size: 5MB. Leave empty to keep current image.
+                                    </small>
+                                </div>
+                                <div class="col-md-4">
+                                    <div id="current-image" class="text-center">
+                                        {% if menu_item.has_image %}
+                                        <img src="{{ url_for('static', filename=menu_item.image_url) }}" alt="{{ menu_item.name }}" 
+                                             class="img-thumbnail" style="max-width: 120px; max-height: 120px;">
+                                        <br><small class="text-info">Current Image</small>
+                                        <br><button type="button" class="btn btn-sm btn-outline-danger" onclick="removeImage()">
+                                            <i class="fas fa-trash"></i> Remove
+                                        </button>
+                                        <input type="hidden" id="remove_image" name="remove_image" value="false">
+                                        {% else %}
+                                        <div class="text-muted">
+                                            <i class="fas fa-image fa-3x mb-2"></i>
+                                            <br><small>No image uploaded</small>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div id="image-preview" class="text-center" style="display: none;">
+                                        <img id="preview-img" src="" alt="New Image Preview" 
+                                             class="img-thumbnail" style="max-width: 120px; max-height: 120px;">
+                                        <br><small class="text-success">New Preview</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="price" class="form-label">Price (₹) *</label>
+                                <input type="number" class="form-control" id="price" name="price" 
+                                       value="{{ menu_item.price }}" min="0" step="0.01" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="category" class="form-label">Category *</label>
+                                <select class="form-select" id="category" name="category" required>
+                                    {% for category in categories %}
+                                    <option value="{{ category }}" {% if menu_item.category == category %}selected{% endif %}>{{ category }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label class="form-label">Food Type</label>
+                                <div class="food-type-selector">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="is_vegetarian" id="vegRadio" value="true" {% if menu_item.is_vegetarian %}checked{% endif %} required>
+                                        <label class="form-check-label food-type-label veg-label" for="vegRadio">
+                                            <img src="{{ url_for('static', filename='veg-icon.png') }}" alt="Veg" class="food-type-icon">
+                                            Vegetarian
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="is_vegetarian" id="nonVegRadio" value="false" {% if not menu_item.is_vegetarian %}checked{% endif %} required>
+                                        <label class="form-check-label food-type-label nonveg-label" for="nonVegRadio">
+                                            <img src="{{ url_for('static', filename='nonveg-icon.png') }}" alt="Non-Veg" class="food-type-icon">
+                                            Non-Vegetarian
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item Statistics -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="bg-light rounded p-3">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <small class="text-muted">Current Status:</small><br>
+                                            <span class="badge bg-{% if menu_item.in_stock %}success{% else %}danger{% endif %}">
+                                                {{ 'Available' if menu_item.in_stock else 'Unavailable' }}
+                                            </span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small class="text-muted">Popularity Score:</small><br>
+                                            <strong>{{ menu_item.popularity }}</strong>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small class="text-muted">Added:</small><br>
+                                            <strong>{{ menu_item.created_at.strftime('%d %b %Y') }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('admin_menu') }}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('toggle_menu_item_stock', item_id=menu_item.id) }}" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-{% if menu_item.in_stock %}warning{% else %}success{% endif %}"
+                                onclick="return confirm('Are you sure you want to {% if menu_item.in_stock %}delist{% else %}list{% endif %} this item?')">
+                            <i class="fas fa-{% if menu_item.in_stock %}eye-slash{% else %}eye{% endif %}"></i>
+                            {% if menu_item.in_stock %}Delist Item{% else %}List Item{% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Image preview function
+function previewImage(input) {
+    const preview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+    const currentImage = document.getElementById('current-image');
+
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            preview.style.display = 'block';
+            currentImage.style.opacity = '0.5';
+            document.getElementById('remove_image').value = 'false';
+        }
+
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        preview.style.display = 'none';
+        currentImage.style.opacity = '1';
+    }
+}
+
+// Remove current image function
+function removeImage() {
+    if (confirm('Are you sure you want to remove the current image?')) {
+        document.getElementById('remove_image').value = 'true';
+        document.getElementById('current-image').innerHTML = `
+            <div class="text-muted">
+                <i class="fas fa-image fa-3x mb-2"></i>
+                <br><small>Image will be removed</small>
+                <br><button type="button" class="btn btn-sm btn-outline-success" onclick="undoRemove()">
+                    <i class="fas fa-undo"></i> Undo
+                </button>
+            </div>
+        `;
+    }
+}
+
+// Undo remove image function
+function undoRemove() {
+    document.getElementById('remove_image').value = 'false';
+    location.reload(); // Simple way to restore the original state
+}
+</script>
+{% endblock %}
