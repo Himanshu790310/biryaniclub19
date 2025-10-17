@@ -1,29 +1,31 @@
-# Production Systemd service file for Biryani Club
-# Place this file at: /etc/systemd/system/biryaniclub.service
-
 [Unit]
-Description=Biryani Club Web Application
-After=network.target
+Description=Biryani Club Gunicorn Application
+After=network.target postgresql.service
 
 [Service]
-Type=simple
+Type=notify
 User=biryaniclub
 Group=biryaniclub
-WorkingDirectory=/home/biryaniclub/biryaniclub14
-Environment=PATH=/home/biryaniclub/biryaniclub14/venv/bin
-EnvironmentFile=/home/biryaniclub/biryaniclub14/.env
-ExecStart=/home/biryaniclub/biryaniclub14/venv/bin/gunicorn --bind 127.0.0.1:5000 --workers 3 --timeout 120 --max-requests 1000 --preload app:app
-ExecReload=/bin/kill -s HUP $MAINPID
-Restart=always
-RestartSec=3
+WorkingDirectory=/opt/biryaniclub
+Environment="PATH=/opt/biryaniclub/venv/bin"
+# Have systemd create /run/biryaniclub with correct ownership and mode
+RuntimeDirectory=biryaniclub
+RuntimeDirectoryMode=0755
+# Tell systemd where the pidfile will be
+PIDFile=/run/biryaniclub/gunicorn.pid
 
-# Security settings
-NoNewPrivileges=yes
-PrivateTmp=yes
-ProtectSystem=strict
-ProtectHome=yes
-ReadWritePaths=/home/biryaniclub/biryaniclub14
+ExecStart=/opt/biryaniclub/venv/bin/gunicorn \
+    --pid /run/biryaniclub/gunicorn.pid \
+    --bind 127.0.0.1:5000 \
+    --workers 3 \
+    --worker-class sync \
+    --timeout 60 \
+    app:app
+
+Restart=always
+RestartSec=10
+NoNewPrivileges=true
+PrivateTmp=true
 
 [Install]
 WantedBy=multi-user.target
-
