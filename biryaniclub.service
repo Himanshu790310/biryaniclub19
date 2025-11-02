@@ -1,0 +1,31 @@
+[Unit]
+Description=Biryani Club Gunicorn Application
+After=network.target postgresql.service
+
+[Service]
+Type=notify
+User=biryaniclub
+Group=biryaniclub
+WorkingDirectory=/opt/biryaniclub
+Environment="PATH=/opt/biryaniclub/venv/bin"
+# Have systemd create /run/biryaniclub with correct ownership and mode
+RuntimeDirectory=biryaniclub
+RuntimeDirectoryMode=0755
+# Tell systemd where the pidfile will be
+PIDFile=/run/biryaniclub/gunicorn.pid
+
+ExecStart=/opt/biryaniclub/venv/bin/gunicorn \
+    --pid /run/biryaniclub/gunicorn.pid \
+    --bind 127.0.0.1:5000 \
+    --workers 3 \
+    --worker-class sync \
+    --timeout 60 \
+    app:app
+
+Restart=always
+RestartSec=10
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
